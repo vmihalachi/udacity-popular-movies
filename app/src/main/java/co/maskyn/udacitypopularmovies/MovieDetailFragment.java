@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +16,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * A fragment representing a single Movie detail screen.
@@ -30,6 +32,14 @@ public class MovieDetailFragment extends Fragment {
     public static final String ARG_ITEM = "item_id";
     // the film
     private Movie movie;
+    // movie description
+    @BindView(R.id.movie_detail) TextView textDetail;
+    // movie rating
+    @BindView(R.id.user_rating) TextView textRating;
+    // release date
+    @BindView(R.id.release_date) TextView textReleaseDate;
+    // poster
+    @BindView(R.id.image) TextView poster;
 
     public MovieDetailFragment() {
     }
@@ -62,27 +72,27 @@ public class MovieDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.movie_detail, container, false);
-
-        // Show the dummy content as text in a TextView.
+        // bind butterknife
+        ButterKnife.bind(this, rootView);
+        // if the movie is not null we set the various views
         if (movie != null) {
             // synopsis
-            ((TextView) rootView.findViewById(R.id.movie_detail)).setText(movie.plotSynopsis);
+            textDetail.setText(movie.plotSynopsis);
             // rating
-            ((TextView) rootView.findViewById(R.id.user_rating)).setText(movie.userRating + "/10");
+            textRating.setText(movie.userRating + "/10");
             // date
             Calendar cal = new GregorianCalendar();
             try {
                 cal.setTime(new SimpleDateFormat("yyyy-MM-dd").parse(movie.releaseDate));
-                ((TextView) rootView.findViewById(R.id.release_date)).setText(String.valueOf(cal.get(Calendar.YEAR)));
+                textReleaseDate.setText(String.valueOf(cal.get(Calendar.YEAR)));
             } catch (ParseException e) {
                 Toast.makeText(getActivity(), getString(R.string.error_parsing_release_date), Toast.LENGTH_SHORT).show();
             }
             // poster
-            ImageView filmPoster = (ImageView) rootView.findViewById(R.id.image);
             Picasso.with(getActivity())
                     .load("http://image.tmdb.org/t/p/w342/" + movie.posterUrl)
                     .placeholder(R.drawable.placeholder)
-                    .error(R.drawable.error).into(filmPoster);
+                    .error(R.drawable.error).into(poster);
         }
 
         return rootView;
