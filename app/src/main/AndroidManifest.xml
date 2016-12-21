@@ -30,6 +30,10 @@
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="co.maskyn.udacitypopularmovies.MovieListActivity"/>
         </activity>
+        <provider
+                android:authorities="co.maskyn.udacitypopularmovies.data.MoviesProvider"
+                android:name="co.maskyn.udacitypopularmovies.data.generated.MoviesProvider"
+                android:exported="false"/>
     </application>
 
 </manifest>

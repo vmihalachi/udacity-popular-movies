@@ -2,7 +2,6 @@ package co.maskyn.udacitypopularmovies;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,34 +10,30 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 
-public class FetchFilmsTask extends AsyncTask<Void, Void, ArrayList<Movie>> {
+import co.maskyn.udacitypopularmovies.adapter.MoviesRecyclerViewAdapter;
+import co.maskyn.udacitypopularmovies.data.Movie;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
-    private final String LOG_TAG = FetchFilmsTask.class.getSimpleName();
+public class FetchMoviesTask extends AsyncTask<Void, Void, ArrayList<Movie>> {
+
+    private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
     private final WeakReference<MovieListActivity> mActivity;
 
-    public FetchFilmsTask(MovieListActivity movieListActivity) {
+    public FetchMoviesTask(MovieListActivity movieListActivity) {
         this.mActivity = new WeakReference<>(movieListActivity);
     }
 
     @Override
     protected ArrayList<Movie> doInBackground(Void... params) {
 
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-        // Will contain the raw JSON response as a string.
-        String moviesJsonStr = null;
         // Will contain the movies
-        ArrayList<Movie> movies = new ArrayList<>();
-        String key = "";
+        ArrayList<Movie> movies = null;
         String queryType;
 
         if (mActivity.get() != null) {
@@ -59,59 +54,17 @@ public class FetchFilmsTask extends AsyncTask<Void, Void, ArrayList<Movie>> {
             }
 
             try {
-                final String MOVIES_BASE_URL =
-                        "http://api.themoviedb.org/3/movie";
-                final String KEY_PARAM = "api_key";
-
-                Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
-                        .appendEncodedPath(queryType)
-                        .appendQueryParameter(KEY_PARAM, key)
+                OkHttpClient client = new OkHttpClient();
+                String url = String.format("http://api.themoviedb.org/3/movie/%s?api_key=%s", queryType, Constants.API_KEY);
+                final Request request = new Request.Builder()
+                        .url(url)
                         .build();
 
-                URL url = new URL(builtUri.toString());
-                Log.v(LOG_TAG, url.toString());
-
-                // Create the request to OpenWeatherMap, and open the connection
-                urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.connect();
-
-                // Read the input stream into a String
-                InputStream inputStream = urlConnection.getInputStream();
-                StringBuffer buffer = new StringBuffer();
-                if (inputStream == null) {
-                    // Nothing to do.
-                    return null;
-                }
-                reader = new BufferedReader(new InputStreamReader(inputStream));
-
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    buffer.append(line + "\n");
-                }
-
-                if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
-                    return null;
-                }
-                moviesJsonStr = buffer.toString();
-                Log.v(LOG_TAG, moviesJsonStr);
-                movies = getMoviesDataFromJson(moviesJsonStr);
+                Response response = client.newCall(request).execute();
+                movies = getMoviesDataFromJson(response.body().string());
             } catch (IOException | JSONException e) {
                 Log.e(LOG_TAG, "Error ", e);
-                // If the code didn't successfully get the weather data, or there was an error when parsin the JSON
                 return null;
-            } finally {
-                if (urlConnection != null) {
-                    urlConnection.disconnect();
-                }
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
-                    }
-                }
             }
         }
 
@@ -124,11 +77,11 @@ public class FetchFilmsTask extends AsyncTask<Void, Void, ArrayList<Movie>> {
         // new data
         if (movies != null && mActivity.get() != null) {
             RecyclerView recyclerView = (RecyclerView) mActivity.get().findViewById(R.id.movie_list);
-            recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(movies, mActivity.get(), mActivity.get().mTwoPane));
+            recyclerView.setAdapter(new MoviesRecyclerViewAdapter(movies, mActivity.get(), mActivity.get().mTwoPane));
         }
     }
 
-    private ArrayList<Movie> getMoviesDataFromJson(String filmJsonStr)
+    private ArrayList<Movie> getMoviesDataFromJson(String jsonStr)
             throws JSONException {
 
         // These are the names of the JSON objects that need to be extracted.
@@ -140,7 +93,7 @@ public class FetchFilmsTask extends AsyncTask<Void, Void, ArrayList<Movie>> {
         final String USER_RATING = "vote_average";
         final String RELEASE_DATE = "release_date";
 
-        JSONObject moviesJson = new JSONObject(filmJsonStr);
+        JSONObject moviesJson = new JSONObject(jsonStr);
         JSONArray movies = moviesJson.getJSONArray(RESULTS);
 
         ArrayList<Movie> result = new ArrayList<>();

@@ -70,33 +70,55 @@
                 android:layout_marginTop="24dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
 
-        <TextView
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textIsSelectable="true"
-                android:text="@string/trailers"
-                tools:context="co.maskyn.udacitypopularmovies.MovieDetailFragment"
-                android:layout_marginTop="24dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
+                android:orientation="horizontal">
 
-        <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/trailers_list"/>
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textIsSelectable="true"
+                        android:text="@string/trailers"
+                        tools:context="co.maskyn.udacitypopularmovies.MovieDetailFragment"
+                        android:layout_marginTop="24dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Headline"/>
 
-        <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/reviews"
-                tools:context="co.maskyn.udacitypopularmovies.MovieDetailFragment"
-                android:layout_marginTop="24dp"
-                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                />
+                <android.support.v7.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/trailers_list"/>
+            </LinearLayout>
 
-        <android.support.v7.widget.RecyclerView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/reviews_list"/>
+            <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reviews"
+                        tools:context="co.maskyn.udacitypopularmovies.MovieDetailFragment"
+                        android:layout_marginTop="24dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                        />
+
+                <android.support.v7.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/reviews_list"/>
+                </LinearLayout>
+        </LinearLayout>
+
+
+
 
     </LinearLayout>
 </ScrollView>

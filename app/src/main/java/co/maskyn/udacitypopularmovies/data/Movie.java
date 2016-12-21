@@ -1,29 +1,9 @@
-package co.maskyn.udacitypopularmovies;
+package co.maskyn.udacitypopularmovies.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Movie implements Parcelable {
-
-    public final int id;
-    public final String posterUrl;
-    public final String originalTitle;
-    public final String plotSynopsis;
-    public final double userRating;
-    public final String releaseDate;
-
-    public int describeContents() {
-        return 0;
-    }
-
-    public void writeToParcel(Parcel out, int flags) {
-        out.writeInt(id);
-        out.writeString(posterUrl);
-        out.writeString(originalTitle);
-        out.writeString(plotSynopsis);
-        out.writeDouble(userRating);
-        out.writeString(releaseDate);
-    }
 
     public static final Parcelable.Creator<Movie> CREATOR
             = new Parcelable.Creator<Movie>() {
@@ -35,6 +15,12 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+    public final int id;
+    public final String posterUrl;
+    public final String originalTitle;
+    public final String plotSynopsis;
+    public final double userRating;
+    public final String releaseDate;
 
     private Movie(Parcel in) {
         id = in.readInt();
@@ -54,8 +40,21 @@ public class Movie implements Parcelable {
         this.releaseDate = releaseDate;
     }
 
-    @Override
-        public String toString() {
-            return String.valueOf(id);
-        }
+    public int describeContents() {
+        return 0;
     }
+
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeInt(id);
+        out.writeString(posterUrl);
+        out.writeString(originalTitle);
+        out.writeString(plotSynopsis);
+        out.writeDouble(userRating);
+        out.writeString(releaseDate);
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(id);
+    }
+}
